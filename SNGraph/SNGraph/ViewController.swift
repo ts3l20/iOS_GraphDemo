@@ -11,13 +11,31 @@ import UIKit
 
 class ViewController: UIViewController {
     
+    var timer: Timer!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         drawLineGraph()
-        
+
         drawBarGraph()
+        
+        drawTransientGraph()
+        
+        startGraphs()
+        
     }
+    
+    func startGraphs(){
+        
+        self.timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { (timer) in
+            
+            self.drawTransientGraph()
+            
+        }
+        
+    }
+    
     
     // MARK: - Draw graphs
     func drawLineGraph() {
@@ -32,6 +50,7 @@ class ViewController: UIViewController {
         
     }
     
+    
     func drawBarGraph() {
     
         let barGraphData = loadBarGraphData()
@@ -43,6 +62,42 @@ class ViewController: UIViewController {
         self.view.addSubview(barGraphView)
         
     }
+    
+    
+    func drawTransientGraph() {
+        
+        let baseFrame = CGRect(x: 10, y: 440, width: view.frame.width-20, height: 200)
+        
+        let lineData = loadLineGraphData()
+        
+        if let lineGraphView = view.viewWithTag(500) as? LineGraphView {
+            
+            for subview in lineGraphView.subviews {
+                
+                subview.removeFromSuperview()
+                
+            }
+            
+            lineGraphView.data = lineData
+            
+            lineGraphView.resetButton.isHidden = true
+            
+            lineGraphView.setup()
+            
+            lineGraphView.setNeedsLayout()
+            
+        } else {
+            
+            let lineGraphView = LineGraphView(frame: baseFrame, data: lineData)
+            
+            lineGraphView.tag = 500
+            
+            self.view.addSubview(lineGraphView)
+        }
+        
+        
+    }
+    
 
     // MARK: - Load data
     func loadLineGraphData()->[MockData]{
@@ -56,6 +111,7 @@ class ViewController: UIViewController {
         return [lineData1]
     }
     
+    
     func loadBarGraphData()->[MockData]{
 
         let xPointsInt = Array(0...20)
@@ -68,6 +124,7 @@ class ViewController: UIViewController {
         
         return [lineData1]
     }
+    
     
     func randYValue(x: [CGFloat?]) -> [CGFloat] {
         
